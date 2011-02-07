@@ -1,0 +1,276 @@
+\chapter{Number Theory}
+\label{Chapter:NumberTheory}
+
+\section{Introduction}
+
+Number theory problems in programming contests involve finding or using properties of numbers and arithmetic. For programming contest problems, this could include things like:
+
+\begin{enumerate}
+\item Elementary Number Theory
+	\begin{enumerate}
+		\item Prime Numbers - numbers which are divisible only by 1, and itself.
+		\item Perfect Numbers - numbers which are the sum of its positive divisors, excluding the number itself.
+		\item Greatest Common Divisor (GCD)
+		\item Integer Factorization - breaking a number into its divisors
+	\end{enumerate}
+\item Combinatorics and other interesting integer sequences
+	\begin{enumerate}
+		\item Fibonacci Numbers - a classic example for recursion and dynamic programming, and related to symmetries, natural growth, and combinatorial problems.
+		\item Catalan Numbers - these occur often in problems that involve full binary trees, parenthesizations, polygon division.
+		\item Factorials - these numbers occur often in combinatorial problems.
+		\item Triangular Numbers - The sum of the $n$ natural numbers from $1$ to $n$. These numbers give you the number of distinct pairs you can select from $n+1$ objects (e.g. number of handshakes between $n+1$ people). They also give you number and arrangements of bowling pins, billiards balls, etc.
+		\item Polygonal Numbers - Numbers that can be arranged into regular polygons. For example, triangular Numbers are one type of polygonal numbers.
+	\end{enumerate}
+\item Machine representation of numbers
+	\begin{enumerate}
+		\item Data Types, Numeric Limits, and Precision
+		\item Base Conversion and other number systems, e.g. Roman Numerals
+	\end{enumerate}
+\end{enumerate}
+
+\section{Factorials}
+Factorial is a function that is used often in combinatorics and probability theory. It's often used as a terrible example of recursion in algorithms textbooks. It's also a terrible example of Dynamic Programming. If you want to compute Factorials (for small $n$), your best bet is to do it iteratively.
+
+The Factorial function is defined by:
+\[n!=\displaystyle\prod_{k=1}^n k \qquad \forall n \in \mathbb{N}\]
+
+Some applications of Factorials in problem solving:
+\begin{itemize}
+\item The factorial $n!$ gives the number of ways in which $n$ objects can be permuted.
+\item The factorial $n!$ is necessarily divisible by all prime numbers up to and including $n$.
+\end{itemize}
+
+Here's a Java program to compute Factorials. It increases very fast so \texttt{BigInteger} becomes very handy. Note that even with \texttt{BigInteger}, an iterative solution is only good for very small $n$. For very large $n$, Stirling's Approximiation is often used, and some other interesting, asymptotically fast ways to compute factorials include the use of its prime factorization: Sch\"{o}nhage-Strassen algorithm.
+
+\lstset{
+	language=java,
+	tabsize=4,
+	basicstyle=\footnotesize,
+}
+\begin{lstlisting}
+// Computing Factorials
+import java.math.BigInteger;
+public class Factorial {
+	/* Compute factorial iteratively */
+	public static BigInteger fact(int n) {
+		BigInteger num = BigInteger.ONE;
+		for (int i = 1; i <= n; i++)
+			num = num.multiply(BigInteger.valueOf(i));
+		return num;
+	}
+}
+\end{lstlisting}
+
+
+\section{Fibonacci Numbers}
+
+Fibonacci numbers, like factorial, are used as textbook examples of recursive functions. The $n$-th Fibonacci number, $F_n$, is given by the following recurrence relation:
+%
+\[F_n = 
+\begin{cases}
+0 & \text{if $n=0$;}\\
+1 & \text{if $n=1$;}\\
+F_{n-1} + F_{n-2} & \text{if $n>1$.}
+\end{cases}\]
+%
+Some applications of Fibonacci numbers in problem solving include:
+\begin{itemize}
+\item Sums of ``shallow diagonals'' in Pascal's triangle are fibonacci numbers.
+\item Computing Fibonacci Primes shows up often as practice ACM problems. Fibonacci Primes are Fibonacci numbers that are prime. It turns out that every Fibonacci prime occurs at a prime index, but not every prime index contains a Fibonacci prime.
+\item Packing grids with dominoes (and other various bin-packing problems). Turns out the number of possible packings of $2 \times 1$ dominoes into a $2 \times n$ board follows the Fibonacci sequence. There are extensions of this for $3 \times 2n$ grids and more generally $n \times m$ grids (where $n$ or $m$ is even). 
+\item Some symmetries for plants in nature (such as seed and petal arrangements) follow Fibonacci sequences (Fibonacci sequences are thus seen as related to optimal packing problems, etc).
+\item A Fibonacci sequence can be used to simulate the growth of a population, e.g. given 1 male and 1 female rabbit, and that a pair of rabbits produce one new pair of rabbits every month, and that rabbits are able to mate after one month, how many rabbits will there be after one year? Instead of developing a solution as a simulation, you may be able to identify the problem as a Fibonacci sequence.
+\end{itemize}
+
+\lstset{
+	language=C,
+	tabsize=4,
+	basicstyle=\footnotesize,
+}
+\begin{lstlisting}
+// Computing the n-th Fibonacci Number in C
+unsigned long fib(int n) 
+{
+	unsigned long f0=0, f1=1;
+	unsigned int i;
+	n += 2;
+	for(i = 2; i < n; i++)
+	{
+		if(i & 0x1) f0 = f0+f1;  // if odd, store in f0
+		else f1 = f0+f1; // if even, store in f1
+	}
+	return (i & 0x1) ? f1 : f0; // if odd, output f1
+}
+\end{lstlisting}
+
+\lstset{
+	language=java,
+	tabsize=4,
+	basicstyle=\footnotesize,
+}
+\begin{lstlisting}
+// Computing the n-th Fibonacci Number in Java
+public class Fibonacci {
+
+	/* Compute fibonacci numbers iteratively using an Array */
+	public static int fib(int n) {
+		int[] f = new int[n + 2];
+		f[0] = 0;
+		f[1] = 1;
+		for (int i = 2; i <= n; i++)
+			f[i] = f[i - 1]+f[i - 2];
+		return f[n];
+	}
+
+	/* Compute fibonacci numbers using matrix form
+	   This method is faster - runs in O(log n)
+	   Credit: Ahmed Shamsul Arefin - Art of Programming Contest */
+	public static int fib_matrix(int n) {
+		int i=1, h=1, j=0, k=0, t=0;
+		while (n > 0) {
+			if (n%2 == 1) { // if n is odd
+				t = j*h;
+				j = i*h + j*k + t;
+				i = i*k + t;
+			}
+			t = h*h;
+			h = 2*k*h + t;
+			k = k*k + t;
+			n = (int) n/2;
+			} 
+		return j;
+	}
+}
+\end{lstlisting}
+
+\section{Catalan Numbers}
+
+Catalan Numbers are a sequence of natural numbers that occur in many combinatorial problems involving branching and recursion. Here's a list of only some of the many problems in combinatorics reduce to finding Catalan numbers:
+
+\begin{itemize}
+\item Catalan's problem- computing the number of binary bracketings of n tokens.
+\item Counting boolean associations - Count the number of ways n factors can be completely parenthesized. (Answer is $C(n-1)$)
+\item Counting well-formed sequences of parentheses - Calculate the number of expressions containing n pairs of parentheses that are correctly matched (Answer is $C(n)$)
+\item Counting the number of full binary trees with $n$ leaves (Answer is $C(n-1)$). A full binary tree is one where each node has either $0$ or $2$ children.
+\item Counting the number of full binary trees with $n$ nodes (Answer is $C(n)$). A full binary tree is one where each node has either $0$ or $2$ children.
+\item Euler's Polygon Division Problem - Figure out how many ways you can diagonally cut a polygon into triangles. (Equivalent to counting polygon triangulations). The answer is $C(n-2)$
+\item Counting the number of monotonic paths through a grid with size $n \times n$. The answer is $C(n)$. This problem is often used as a visual example to teach both Catalan numbers and dynamic programming.
+\item Counting the number of ways to create a stairstep shaped area of height $n$ with $n$ rectangles. The answer is $C(n)$.
+\item Counting the number of ways to make handshakes without crossing hands.
+\item Counting the number of ``mountain ranges'' you can draw with $n$ upstrokes and $n$ downstrokes. (Related to monotonic paths problem listed above)
+\end{itemize}
+
+Catalan numbers are given by the following closed-form equations:
+
+\[C_n = \dfrac{1}{n+1}{\dbinom{2n}{n}} = \dfrac{(2n)!}{(n+1)!\,n!} \qquad\mbox{ for }n\ge 0.\]
+
+However, the equations above require computation of binomial coefficients or factorials. An alternative way to compute Catalan numbers is through its recurrence relations:
+
+\[C_0 = 1 \quad \mbox{and} \quad C_{n+1}=\displaystyle\sum_{i=0}^{n}C_i\,C_{n-i}\quad\mbox{for }n\ge 0.\]
+
+Which can be done with Dynamic Programming. However, turns out that Catalan Numbers also go by this recurrence relation that is even easier to compute iteratively:
+
+\[C_0 = 1 \quad \mbox{and} \quad C_{n+1}=\dfrac{2(2n+1)}{n+2}C_n\]
+
+\lstset{
+	language=java,
+	tabsize=4,
+	basicstyle=\footnotesize,
+}
+\begin{lstlisting}
+// Author: Christopher Vo
+// Various ways of computing the Catalan Numbers
+// Direct method (fastest): catalan(n)
+// Using Factorial (slow): catalan_fact(n)
+// Using Binomial Coefficients (slowest): catalan_binom(n)
+import java.math.BigInteger;
+public class NumberTests {
+
+	/* Compute factorial iteratively */
+	public static BigInteger fact(int n) {
+		BigInteger num = BigInteger.ONE;
+		for (int i = 1; i <= n; i++)
+			num = num.multiply(BigInteger.valueOf(i));
+		return num;
+	}
+
+	/* Compute binomial coefficient (n choose m) using DP (with BigInteger) */
+	public static BigInteger binomial(int n, int m) {
+		int i, j;
+		BigInteger[] b = new BigInteger[n + 1];
+		b[0] = BigInteger.ONE;
+		for (i = 1; i <= n; i++) {
+			b[i] = BigInteger.ONE;
+			for (j = i - 1; j > 0; j--)
+				b[j] = b[j].add(b[j - 1]);
+		}
+		return b[m];
+	}
+
+	/* Calculate Catalan number directly iteratively (fastest) */
+	public static BigInteger catalan(int n) {
+		BigInteger[] c = new BigInteger[n + 1];
+		c[0] = BigInteger.ONE;
+		for (int i = 1; i <= n; i++)
+			c[i] = c[i - 1].multiply(BigInteger.valueOf(4 * i - 2)).divide(
+					BigInteger.valueOf(i + 1));
+		return c[n];
+	}
+
+	/* Calculate Catalan number using factorial (slow) */
+	public static BigInteger catalan_fact(int n) {
+		return fact(2 * n).divide(fact(n + 1).multiply(fact(n)));
+	}
+
+	/* Calculate Catalan number using binomial coefficients (slowest) */
+	public static BigInteger catalan_binom(int n) {
+		return binomial(2 * n, n).divide(BigInteger.valueOf(n + 1));
+	}
+}
+\end{lstlisting}
+
+\section{Greatest Common Divisor}
+The {\em greatest common divisor} of two positive numbers is the largest integer that divides both numbers without a remainder. There are several algorithms to compute the greatest common divisor:
+
+\subsection{Using Prime Factorization}
+
+Compute first the prime factorization of the two numbers, and compare the factors. For example, when finding the prime factorization of $48 = 2^4 \cdot 3$ and $180 = 2^2 \cdot 3^2 \cdot 5$, they share $2 \cdot 2 \cdot 3 = 12$ in common. Therefore, the GCD is 12.
+
+\subsection{Using Euclid's Algorithm}
+
+This is an efficient and simple algorithm for computing the GCD. Recall that GCD is the largest number that divides both without a remainder. The GCD does not change if the smaller number is subtracted from the larger number. 
+
+\lstset{
+	language=java,
+	tabsize=4,
+	basicstyle=\footnotesize,
+}
+\begin{lstlisting}
+// Euclidean algorithm for computing GCD in Java, Iterative
+public static int gcd(int a, int b) {
+    int r; // remainder
+    while(b != 0) { 
+        r = a % b;
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+// Euclidean algorithm for computing GCD in Java, Recursive
+public static int gcd(int a, int b) {
+	if (b == 0)
+		return a;
+	else
+		return gcd(b, a % b);
+}
+\end{lstlisting}
+
+\section{Polygonal Numbers}
+
+Polygonal numbers are numbers that can be arranged into a regular polygon. Turns out some problems have appeared in ACM programming contests directly asking about polygonal numbers. 
+
+More importantly: If $s$ is the number of sides in a polygon, the formula for the $n$-th $s$-gonal number is
+
+\[\dfrac{(s-2)n^2-(s-4)n}{2}\]
+
