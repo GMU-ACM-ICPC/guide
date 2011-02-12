@@ -1,0 +1,94 @@
+\chapter{Parsing}
+\label{Chapter:Parsing}
+
+\section{Introduction}
+
+In reading this, it is assumed you know how to do basic parsing in
+your language of choice. This will not cover that. Instead, this will
+cover the parsing of more complicated structures. %make a better, less
+                                %challenging into
+
+\section{Language Theory}
+
+A langauge ahs two basic compoents to it. The first is an alphabet
+which is a set of characters. This could be anything from '(' and ')'
+to every character in unicode. The second part is a grammar which is a
+set of rules for valid combination of characters in the alphabet. For
+instance we can define a language as the characters a and b with a
+grammar that all as must be before all bs. To be able to take away the
+ambiguities of language and to have a standard representation, certain
+grammar representations have come up based around different classes.
+
+\subsection{Regular Expressions}
+
+Regular expressions, also known as regex, are the simplest
+representation. For simplicity, assume the alphabet for all examples
+includes whatever is shown in the grammar. Regex allows four simple
+operations. The first is the or operator '[a,b]' whose language consists
+of only 'a' and 'b'. The second operator is concatentation 'ab' which
+allows you to put characters together and in this case only allows
+ab. There is the optional operator 'a+' which allows the empty string, '',
+or 'a'. Finally, there is the continuation operator 'a*' which allows
+any number of 'a's such as '', 'a', 'aa' and 'aaaaaaaaaaa' among
+others.
+
+Combining these allows some powerful combinations. For instance, to
+verify an integer number. A simple attempt would be '[0-9]*'. That
+will however allow '000000' in the language. Another attempt might be
+'[1-9][0-9]*'.  This however doesn't allow '0'. Instead, we now try
+'[0.[1-9][0-9]*]'. This works for all positive integers. I leave
+finishing this as an exercise to the reader. This however should show
+the care that has to be given to these expressions.
+
+Additionally, note that these can be represented as a finite state
+machine.
+
+Another problem that would seem useful is the parentheses matching
+problem. If the number of paretheses is not finite, regex cannot
+handle this. The reader should attempt to convince his/herself of this
+before continuing.
+
+In order to solve the parentheses problem, something stronger is
+needed.
+
+\subsection{Context-Free Grammars}
+
+In order to represent this, we need a more sophisticated
+alphabet. It will be split into the set of  terminals and nonterminals
+The terminals are the equivelant of the old definition of
+alphabet. The nonterminals are a set that will not be mapped directly
+to the expression in the language, but are used in the grammar.
+
+We will begin by implementing the regex operators to a CFG.
+$$W \rightarrow a$$
+$$W \rightarrow b$$
+$$X \rightarrow ab$$
+$$Y \rightarrow a$$
+$$Y \rightarrow $$
+$$Z \rightarrow Za$$
+$$Z \rightarrow $$
+The capital letters are the nonterminals and noncapital are
+terminals\footnote{As per convention.}. All terminals may use any definition and can use other
+terminals or be recursive. In order to create a valid expression in
+the language, it must be mapped such that only nonterminals are
+used. As a result, try to convince yourself that W is or, X is
+concatenation, Y is optional, and Z is continuaous.
+
+Addiitonally, let's now implement the parentheses matching problems.
+$$S \rightarrow ()$$
+$$S \rightarrow (S)$$
+$$S \rightarrow SS$$
+
+\section{Related Algorithms}
+
+\subsection{Regular Expression}
+
+If your language is able to be represented by a regular expression you
+can use the languages built in regular expressions. Please consult
+your language's documentation as there are slight idiosyncracies
+between different implementations.
+
+\subsection{Recursive Descent Parsing}
+
+This technique can be used for  context free grammars. Essentially
+you have a method for eac
