@@ -5,17 +5,16 @@
 
 In reading this, it is assumed you know how to do basic parsing in
 your language of choice. This will not cover that. Instead, this will
-cover the parsing of more complicated structures. %make a better, less
-                                %challenging into
+cover the parsing of more complicated structures.
 
 \section{Language Theory}
 
-A langauge ahs two basic compoents to it. The first is an alphabet
+A langauge has two basic compoents to it. The first is an alphabet
 which is a set of characters. This could be anything from '(' and ')'
 to every character in unicode. The second part is a grammar which is a
 set of rules for valid combination of characters in the alphabet. For
 instance we can define a language as the characters a and b with a
-grammar that all as must be before all bs. To be able to take away the
+grammar that all a's must be before all b's. To be able to take away the
 ambiguities of language and to have a standard representation, certain
 grammar representations have come up based around different classes.
 
@@ -29,7 +28,7 @@ of only 'a' and 'b'. The second operator is concatentation 'ab' which
 allows you to put characters together and in this case only allows
 ab. There is the optional operator 'a+' which allows the empty string, '',
 or 'a'. Finally, there is the continuation operator 'a*' which allows
-any number of 'a's such as '', 'a', 'aa' and 'aaaaaaaaaaa' among
+any number of a's such as '', 'a', 'aa' and 'aaaaaaaaaaa' among
 others.
 
 Combining these allows some powerful combinations. For instance, to
@@ -59,7 +58,7 @@ The terminals are the equivelant of the old definition of
 alphabet. The nonterminals are a set that will not be mapped directly
 to the expression in the language, but are used in the grammar.
 
-We will begin by implementing the regex operators to a CFG.
+We will begin by implementing the regex operators as a CFG.
 $$W \rightarrow a$$
 $$W \rightarrow b$$
 $$X \rightarrow ab$$
@@ -68,10 +67,11 @@ $$Y \rightarrow $$
 $$Z \rightarrow Za$$
 $$Z \rightarrow $$
 The capital letters are the nonterminals and noncapital are
-terminals\footnote{As per convention.}. All terminals may use any definition and can use other
-terminals or be recursive. In order to create a valid expression in
-the language, it must be mapped such that only nonterminals are
-used. As a result, try to convince yourself that W is or, X is
+terminals\footnote{As per convention.}. In order to be considered in the grammar
+(where the grammar is defined by a nonterminal),it is necessary to
+replace the nonterminals with equivelant expressions until the phrase
+is reached. Nonterminals may have multiple mappings and any of htem
+may be used. Try to convince yourself that W is or, X is
 concatenation, Y is optional, and Z is continuaous.
 
 Addiitonally, let's now implement the parentheses matching problems.
@@ -79,16 +79,47 @@ $$S \rightarrow ()$$
 $$S \rightarrow (S)$$
 $$S \rightarrow SS$$
 
+Convince yourself that this is correct. It will be used again later.
+
 \section{Related Algorithms}
 
 \subsection{Regular Expression}
 
 If your language is able to be represented by a regular expression you
-can use the languages built in regular expressions. Please consult
+can use the language's built in regular expressions. Please consult
 your language's documentation as there are slight idiosyncracies
-between different implementations.
+between different implementations. The regex mentioned earlier should
+match java's implementation.
 
 \subsection{Recursive Descent Parsing}
 
 This technique can be used for  context free grammars. Essentially
-you have a method for eac
+you have a method for each nonterminal. What follows is the earlier
+example on parentheses.
+
+\begin{algorithm}
+\caption{$\mathrm{f}(x)$ - Simple Recursive Descent Parser}
+\label{parsing:RDP}
+\begin{algorithmic}
+\IF{$x = '()'$}
+\RETURN{true}
+\ENDIF
+\IF{$x[0] ='('$  and $x[len - 1] = ')'$}
+\IF{ f(x[1 to len-2]}
+\RETURN{true}
+\ENDIF
+\ENDIF
+\FOR{i = 1:len}
+\IF{f(x[0:i]) and f(x[i+1:len - 2])}
+\RETURN{true}
+\ENDIF
+\ENDFOR
+\RETURN{false}
+\end{algorithmic}
+\end{algorithm}
+
+Note that the first two ifs line up rather nicely. The last one
+doesn't. This algorithm while not efficient in the last case, will
+work. It is left as an exercise to the reader to optimize the last
+case to be more efficient.Be aware that you can use certain properties
+of the grammar to make it more efficient.
